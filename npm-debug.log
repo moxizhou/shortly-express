@@ -1,0 +1,26 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'uninstall', 'nodemon' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.32
+4 verbose node_modules/nodemon unbuild
+5 info preuninstall nodemon@1.2.1
+6 info uninstall nodemon@1.2.1
+7 verbose true,/Users/moxi/Documents/GIT/2014-09-shortly-express/node_modules,/Users/moxi/Documents/GIT/2014-09-shortly-express/node_modules unbuild nodemon@1.2.1
+8 verbose /Users/moxi/Documents/GIT/2014-09-shortly-express/node_modules/.bin,[object Object] binRoot
+9 info postuninstall nodemon@1.2.1
+10 error Error: EACCES, unlink '/Users/moxi/Documents/GIT/2014-09-shortly-express/node_modules/nodemon/node_modules/update-notifier/node_modules/.bin/semver'
+10 error  { [Error: EACCES, unlink '/Users/moxi/Documents/GIT/2014-09-shortly-express/node_modules/nodemon/node_modules/update-notifier/node_modules/.bin/semver']
+10 error   errno: 3,
+10 error   code: 'EACCES',
+10 error   path: '/Users/moxi/Documents/GIT/2014-09-shortly-express/node_modules/nodemon/node_modules/update-notifier/node_modules/.bin/semver' }
+11 error Please try running this command again as root/Administrator.
+12 error System Darwin 13.4.0
+13 error command "node" "/usr/local/bin/npm" "uninstall" "nodemon"
+14 error cwd /Users/moxi/Documents/GIT/2014-09-shortly-express
+15 error node -v v0.10.32
+16 error npm -v 1.4.28
+17 error path /Users/moxi/Documents/GIT/2014-09-shortly-express/node_modules/nodemon/node_modules/update-notifier/node_modules/.bin/semver
+18 error code EACCES
+19 error errno 3
+20 error stack Error: EACCES, unlink '/Users/moxi/Documents/GIT/2014-09-shortly-express/node_modules/nodemon/node_modules/update-notifier/node_modules/.bin/semver'
+21 verbose exit [ 3, true ]
