@@ -107,9 +107,13 @@ app.post('/login', function(req, res){
   var username = req.body.username;
   var password = req.body.password;
 
+  // bcrypt.compareSync(password, hash);
+
   db.knex('users').where('username', '=', username)
     .then(function(urls) {
       if (urls['0'] && urls['0']['username']) {
+        urls
+        if (bcrypt.compareSync(password, hash))
         req.session.regenerate(function() {
         req.session.user = username;
         res.redirect('/');
@@ -121,13 +125,13 @@ app.post('/login', function(req, res){
 });
 
 app.post('/signup', function(req, res){
-  var username = req.body.username;
-  var password = req.body.password;
   var user = new User({
-    username: username,
-    password: password
+    username: req.body.username,
+    password: req.body.password
   });
+
   user.save().then(function(newLink) {
+    newLink.save();
     Users.add(newLink);
     res.redirect('/');
   });
