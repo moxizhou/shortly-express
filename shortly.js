@@ -17,6 +17,7 @@ var app = express();
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(partials());
+// app.use(express.cookieParser('moxi')); 
 app.use(session({secret: 'moxi'}));
 // Parse JSON (uniform resource locators)
 app.use(bodyParser.json());
@@ -30,7 +31,7 @@ var restrict = function(req, res, next) {
   } else {
     res.redirect('./login');
   }
-};
+}; 
 
 app.get('/', restrict,
 function(req, res) {
@@ -107,39 +108,56 @@ app.post('/login', function(req, res){
   var username = req.body.username;
   var password = req.body.password;
 
-  db.knex('users').where('username', '=', username)
-    .then(function(data) {
-      if (data['0'] && data['0']['username']) {
-        var hash = data['0']['password'];
-        bcrypt.compare(password, hash, function(err, result) {
-          if (result) {
-            req.session.regenerate(function() {
-            req.session.user = username;
+// db.knex('users').where('username', '=', username)
+//     .then(function(data) {
+new User({username: username}).fetch().then(function(user){
+    if( !user ){
+      console.log("Wrong username or password!")
+      res.redirect('/login');
+    } else { 
+      if( user.comparePassword(password, function(match){
+        if( match) {
+          return req.session.regenerate(function() {
+            req.session.user = user;
+            console.log("Successfully logged in!")
             res.redirect('/');
-            })
-          } else {
-            res.redirect('/login');
-          } 
-        })
-      } else {
-        res.redirect('/login');
-      }
-    })
-  });
-
-app.post('/signup', function(req, res){
-  var user = new User({
-    username: req.body.username,
-    password: req.body.password
-  });
-
-  user.save().then(function(newLink) {
-    newLink.save();
-    Users.add(newLink);
-    res.redirect('/');
+          })
+        } else {
+          console.log("Wrong username or password!")
+          res.redirect('/login')
+        }
+      }));
+    }
   });
 });
 
+app.post('/signup', function(req, res){
+  var username = req.body.username;
+  var password = req.body.password;
+
+  var user = new User({
+    username: username,
+    password: password
+  });
+
+  db.knex('users').where('username', '=', username)
+    .then(function(data) {
+      if (!data['0']) {
+        user.save().then(function(data) {
+          return req.session.regenerate(function() {
+            req.session.user = user;
+            Users.add(data);
+            console.log("Successfully made new user!")
+            res.redirect('/');
+          })
+        })
+      } else {
+        console.log("User already exists!");
+        res.redirect('/signup');
+      }
+    });
+
+});
 
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail
@@ -171,3 +189,10 @@ app.get('/*', function(req, res) {
 
 console.log('Shortly is listening on 4568');
 app.listen(4568);
+
+//sessions are tokens with expiring date
+//cookies do not expire, but you an can add expire to them
+//visit fb within a month, log out, but everytime you are on there, updates session
+//client interacts with server passing along cookies (with session id), server look
+//up in table, see which session was there before and has a lot of information
+//store session id in server and cookies

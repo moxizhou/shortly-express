@@ -7,15 +7,23 @@ var User = db.Model.extend({
   hasTimestamps: true,
 
 initialize: function() {
-	this.on('creating', function(model, attrs, done){
-		bcrypt.genSalt(5, function(err, salt) {
-			bcrypt.hash(model.attributes.password, salt, null, function(err, hash) {
-				model.attributes.password = hash;
-			})
-		})
+	var create = Promise.promisify(bcrypt.hash);
+
+	this.on('creating', function(model){
+		return create(this.get('password'), null, null)
+			.bind(this).then(function(hash) {
+				this.set('password', hash);
+			});
 	});
-	}
+},
+
+comparePassword: function(attemptedPassword, callback) {
+	bcrypt.compare(attemptedPassword, this.get('password'), function(err, isMatch) {
+		callback(isMatch);
+	});
+}
 
 });
+
 
 module.exports = User;
